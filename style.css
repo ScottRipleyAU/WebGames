@@ -1,0 +1,87 @@
+body {
+    background-color: #f0f0f0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: sans-serif;
+}
+
+.container {
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.content {
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+p {
+    line-height: 1.6;
+}
+
+.playerInput {
+    margin-bottom: 10px;
+}
+
+.playerInput label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.playerInput input,
+.playerInput select {
+    width: 200px;
+    padding: 5px;
+}
+
+#card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: #e0f7fa;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 1.2em;
+    text-align: center;
+}
+
+#card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.4em;
+}
+
+#buttonContainer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#buttonContainer button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+}
+
+#buttonContainer button:hover {
+    background-color: #43a047;
+}
+
+#scoreDisplay {
+    margin-top: 20px;
+    text-align: center;
+}
