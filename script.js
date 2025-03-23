@@ -10,10 +10,7 @@ const roundCounterDisplay = document.getElementById('roundCounter');
 let cardTexts = [
     { text: "Take a sip!", category: "Sip" },
     { text: "Confess a sin!", category: "Sin" },
-    { text: "Another sip!", category: "Sip" },
-    { text: "Tell a secret sin!", category: "Sin" },
-    { text: "Finish your drink!", category: "Sip" },
-    // Add more cards with text and category
+    // ... more cards ...
 ];
 
 let currentCardIndex = 0;
@@ -128,4 +125,9 @@ playerForm.addEventListener('submit', function(event) {
 
     shuffleArray(cardTexts);
 
-    playerSetup.style.display = '
+    playerSetup.style.display = 'none';
+    gameScreen.style.display = 'block';
+    updateTurnDisplay();
+    displayNextCard();
+    updateScoreDisplay();
+});
