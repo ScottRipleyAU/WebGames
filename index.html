@@ -3,26 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Website</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Game Setup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div id="playerSetup" class="content">
-        </div>
-        <div id="gameScreen" class="content" style="display: none;">
-            <h2 id="turnDisplay"></h2>
-            <h3 id="roundCounter">Round: 1</h3>
-            <div id="card">
-                <p id="cardText">Initial Card Text</p>
+<body class="bg-gradient-to-r from-pink-400 to-purple-500 h-screen flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md transition-transform hover:scale-105">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center bg-gradient-to-r from-indigo-500 to-blue-500 text-transparent bg-clip-text">Game Setup</h2>
+        <div id="player-inputs" class="space-y-4 mb-6">
             </div>
-            <div id="buttonContainer">
-                <button id="sipButton">Sip</button>
-                <button id="sinButton">Sin</button>
+        <button id="add-player" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition-colors duration-300">Add Player</button>
+        <div id="intensity-selection" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Intensity:</h3>
+            <div class="flex space-x-4">
+                <div class="flex items-center">
+                    <input type="radio" id="light" name="intensity" value="light" class="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300 focus:ring-opacity-50" >
+                    <label for="light" class="ml-2 text-sm font-medium text-gray-900">Light</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="radio" id="medium" name="intensity" value="medium" class="w-4 h-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 focus:ring-opacity-50">
+                    <label for="medium" class="ml-2 text-sm font-medium text-gray-900">Medium</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="radio" id="spicy" name="intensity" value="spicy" class="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300 focus:ring-opacity-50">
+                    <label for="spicy" class="ml-2 text-sm font-medium text-gray-900">Spicy</label>
+                </div>
             </div>
-            <div id="scoreDisplay"></div>
         </div>
+        <button id="start-game" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition-colors duration-300 text-lg">Start Game</button>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        const playerInputs = document.getElementById('player-inputs');
+        const addPlayerButton = document.getElementById('add-player');
+        const startGameButton = document.getElementById('start-game');
+        let playerCount = 0;
+        let players = [];
+
+        function createPlayerInput(playerNumber) {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'flex items-center gap-4';
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'remove-player-button text-red-500 hover:text-red-700 transition-colors duration-200';
+            button.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            button.addEventListener('click', () => {
+                playerDiv.remove();
+                playerCount--;
+                updatePlayerNumbers();
+                localStorage.removeItem(`player${playerNumber}Name`);
+                localStorage.removeItem(`gender${playerNumber}`);
+                players = players.filter(p => p.playerNumber !== playerNumber); // Remove player from array
+            });
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'space-y-2 flex-grow';
+            const nameLabel = document.createElement('label');
+            nameLabel.for = `player${playerNumber}`;
+            nameLabel.className = 'block text-gray-700 text-sm font-bold mb-1';
+            nameLabel.textContent = `Player ${playerNumber} Name:`;
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.id = `player${playerNumber}`;
+            nameInput.name = `player${playerNumber}`;
+            nameInput.placeholder = `Enter Player ${playerNumber} Name`;
+            nameInput.value = localStorage.getItem(`player${playerNumber}Name`) || '';
+            nameInput.className = 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline';
+            nameDiv.appendChild(nameLabel);
+            nameDiv.appendChild(nameInput);
+
+            const genderDiv = document.createElement('div');
+            genderDiv.className = 'space-y-2 min-w-[150px]';
+            const genderLabel = document.createElement('label');
+            genderLabel.for = `gender${playerNumber}`;
+            genderLabel.className = 'block text-gray-700 text-sm font-bold mb-1';
+            genderLabel.textContent = `Gender:`;
+            const genderSelect = document.createElement('select');
+            genderSelect.id = `gender${playerNumber}`;
+            genderSelect.name = `gender${playerNumber}`;
+            genderSelect.className = 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline';
+
+            const maleOption = document.createElement('option');
+            maleOption.value = 'male';
+            maleOption.textContent = 'Male';
+            const femaleOption = document.createElement('option');
+            femaleOption.value = 'female';
+            femaleOption.textContent = 'Female';
+            const otherOption = document.createElement('option');
+            otherOption.value = 'other';
+            otherOption.textContent = 'Other';
+
+            genderSelect.appendChild(maleOption);
+            genderSelect.appendChild(femaleOption);
+            genderSelect.appendChild(otherOption);
+            genderSelect.value = localStorage.getItem(`gender${playerNumber}`) || 'male';
+            genderDiv.appendChild(genderLabel);
+            genderDiv.appendChild(genderSelect);
+
+            playerDiv.appendChild(button);
+            playerDiv.appendChild(nameDiv);
+            playerDiv.appendChild(genderDiv);
+            return playerDiv;
+        }
+
+        addPlayerButton.addEventListener('click', () => {
+            playerCount++;
+            const newPlayerInput = createPlayerInput(playerCount);
+            const nameInput = newPlayerInput.querySelector('input[type="text"]');
+            nameInput.value = '';
+            playerInputs.appendChild(newPlayerInput);
+            updatePlayerNumbers();
+        });
+
+        function updatePlayerNumbers() {
+            const playerDivs = playerInputs.querySelectorAll('.flex.items-center.gap-4');
+            playerCount = playerDivs.length;
+            players = []; // Clear the players array
+            playerDivs.forEach((playerDiv, index) => {
+                const playerNumber = index + 1;
+                const nameInput = playerDiv.querySelector('input[id^="player"]');
+                const genderSelect = playerDiv.querySelector('select[id^="gender"]');
+
+                // Update player number in the UI
+                const nameLabel = playerDiv.querySelector('label[for^="player"]');
+                nameLabel.textContent = `Player ${playerNumber} Name:`;
+                nameLabel.setAttribute('for', `player${playerNumber}`);
+                nameInput.id = `player${playerNumber}`;
+                nameInput.name = `player${playerNumber}`;
+
+                const genderLabel = playerDiv.querySelector('label[for^="gender"]');
+                genderLabel.textContent = `Gender:`;
+                genderLabel.setAttribute('for', `gender${playerNumber}`);
+                genderSelect.id = `gender${playerNumber}`;
+                genderSelect.name = `gender${playerNumber}`;
+
+                // Add player to the players array
+                players.push({
+                    playerNumber: playerNumber,
+                    name: nameInput.value,
+                    gender: genderSelect.value,
+                });
+                localStorage.setItem(`player${playerNumber}Name`, nameInput.value);
+                localStorage.setItem(`gender${playerNumber}`, genderSelect.value);
+            });
+            localStorage.setItem('playerCount', playerCount);
+            localStorage.setItem('players', JSON.stringify(players));
+        }
+
+
+
+        // Initial setup for the first two players.
+        if (!localStorage.getItem('playerCount')) {
+            localStorage.setItem('playerCount', 2);
+        }
+        playerCount = parseInt(localStorage.getItem('playerCount'));
+
+
+        for (let i = 1; i <= playerCount; i++) {
+            playerInputs.appendChild(createPlayerInput(i));
+        }
+
+
+
+        startGameButton.addEventListener('click', () => {
+            players = [];
+            for (let i = 1; i <= playerCount; i++) {
+                const playerName = document.getElementById(`player${i}`).value;
+                const playerGender = document.getElementById(`gender${i}`).value;
+
+                localStorage.setItem(`player${i}Name`, playerName);
+                localStorage.setItem(`gender${i}`, playerGender);
+
+
+                players.push({
+                    name: playerName,
+                    gender: playerGender,
+                });
+            }
+            const intensity = document.querySelector('input[name="intensity"]:checked')?.value;
+            localStorage.setItem('intensity', intensity);
+            localStorage.setItem('playerCount', playerCount);
+            localStorage.setItem('players', JSON.stringify(players));
+
+
+            if (!intensity) {
+                alert('Please select an intensity level.');
+                return;
+            }
+
+            if (players.some(player => !player.name.trim())) {
+                alert('Please enter names for all players.');
+                return;
+            }
+
+            localStorage.setItem('players', JSON.stringify(players));
+            window.location.href = 'opponents.html';
+        });
+        window.onload = () => {
+        const savedIntensity = localStorage.getItem('intensity');
+        if (savedIntensity) {
+            const intensityInput = document.querySelector(`input[name="intensity"][value="${savedIntensity}"]`);
+            if (intensityInput) {
+                intensityInput.checked = true;
+            }
+        }
+    };
+    </script>
 </body>
 </html>

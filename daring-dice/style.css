@@ -1,0 +1,203 @@
+/* General Styles (same as before) */
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b33951;
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Keep column for button below dice */
+    align-items: center;
+    width: auto; /* Adjust container width */
+    padding: 70px 20px 100px;
+    border-radius: 30px;
+    background: #eeeeee;
+    box-shadow: 0 0 20px rgba(0, 0, 0, .1);
+    position: relative;
+}
+
+.dice-container {
+    display: flex;
+    flex-direction: column; /* Stack label and dice vertically */
+    justify-content: center;
+    margin: 10px; /* Space between dice */
+}
+
+/* Add a new container to wrap the dice-containers */
+.dice-row {
+    display: flex; /* Make this a flex row */
+    justify-content: center; /* Center the dice horizontally */
+    margin-top: 20px;
+}
+
+/* Dice Styles (same as before) */
+.dice-label {
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.dice {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease-out;
+    font-size: 24px;
+    font-weight: bold;
+    color: #131210;
+}
+
+@keyframes rolling {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    100% {
+        transform: rotateX(1800deg) rotateY(1800deg) rotateZ(360deg);
+    }
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    border: 5px solid #f6f3f0;
+    transform-style: preserve-3d;
+    background: linear-gradient(145deg, #dddbd8, #fff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.face span {
+    display: flex; /* changed from block to flex */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.5;
+    width: 100%;  /* added to make sure the span takes full width */
+    height: 100%; /* added to make sure the span takes full height */
+}
+
+.face::before {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background: #f6f3f0;
+    transform: translateZ(-1px);
+}
+
+.face::after {
+    display: none;
+}
+
+.front {
+    transform: translateZ(35px); /* Adjusted for smaller dice */
+}
+
+.back {
+    transform: rotateX(180deg) translateZ(35px); /* Adjusted for smaller dice */
+}
+
+.top {
+    transform: rotateX(90deg) translateZ(35px); /* Adjusted for smaller dice */
+}
+
+.bottom {
+    transform: rotateX(-90deg) translateZ(35px); /* Adjusted for smaller dice */
+}
+
+.right {
+    transform: rotateY(90deg) translateZ(35px); /* Adjusted for smaller dice */
+}
+
+.left {
+    transform: rotateY(-90deg) translateZ(35px); /* Adjusted for smaller dice */
+}
+
+/* Roll Button styles (same as before) */
+.roll {
+    cursor: pointer;
+    color: #b33951;
+    margin-top: 30px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font: 700 26px 'Montserrat';
+    border: 2px solid #b33951;
+    transition: .4s;
+}
+
+.back-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font: 700 18px 'Montserrat';
+    border: 2px solid #b33951;
+    transition: .4s;
+    background-color: transparent;
+    color: #b33951;
+    cursor: pointer;
+    z-index: 10; /* Ensure the button is above other elements */
+}
+#player-instruction{
+    margin-top: 30px;
+}
+
+.back-button:hover {
+    background-color: #b33951;
+    color: #fff;
+}
+
+.roll:hover {
+    color: #fff;
+    background: #b33951;
+}
+@media (max-width: 600px) { /* Adjust breakpoint as needed */
+    .container {
+        padding: 10px 10px 20px;
+        width: 95%;
+    }
+
+    .dice-row {
+        flex-direction: column;
+        align-items: center; /* Center dice horizontally */
+    }
+
+    .dice-container {
+        margin: 10px 0;
+        align-items: center; /* Center dice and label horizontally */
+    }
+
+    .dice {
+        width: 100px;
+        height: 100px;
+        font-size: 24px;
+    }
+
+    .roll {
+        font-size: 20px;
+    }
+    .dice-label {
+        font-size: 26px;
+    }
+    
+}

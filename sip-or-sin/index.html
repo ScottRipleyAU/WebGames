@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sip or Sin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #result {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            max-width: 300px;
+            height: 400px;
+            border-radius: 16px;
+            border: 2px solid #e5e7eb;
+            background-color: #f0f4f8; /* Light gray background for the card */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 2rem;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.2rem;
+            color: #4b5563;
+        }
+        #result h2 {
+            font-size: 2rem; /* Increased font size for player name */
+            font-weight: 700; /* Make player name bold */
+            margin-bottom: 1rem; /* Increased margin below player name */
+            color: #6b7280;
+        }
+        #result p {
+            margin-bottom: 0.5rem;
+        }
+        .sip-text {
+            font-style: italic;
+            color: #10b981; /* Green color for "Sip If" */
+            display: block; /* Make "Sip If" appear on its own line */
+        }
+        .sin-text {
+            font-style: italic;
+            color: #ef4444; /* Red color for "Sin" */
+            display: block; /* Make sin text appear on its own line */
+        }
+        .opponent-text {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        .sin-bottom {
+            font-weight: bold;
+            color: #ef4444;
+            font-size: 1.5rem;  /* Increased font size for emphasis */
+            /* Added styling to make it sexy */
+            font-family: 'Arial Black', sans-serif;  /* Use a bold, impactful font */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3); /* Add a shadow */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-pink-400 to-purple-500 h-screen flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md transition-transform hover:scale-105 relative">
+        <button class="back-button absolute top-4 right-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300 text-lg" onclick="window.location.href='../gameplay.html'">Back</button>
+        <div class="flex justify-center items-center h-full">
+            <button id="sip-or-sin-button" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 px-12 rounded-full shadow-lg focus:outline-none focus:shadow-outline transition-all duration-300 text-2xl">
+                Sip or Sin
+            </button>
+        </div>
+        <div id="result" class="mt-8"></div>
+    </div>
+
+    <script>
+        const sipOrSinButton = document.getElementById('sip-or-sin-button');
+        const result = document.getElementById('result');
+
+        const sipCards = [
+            "You had sex in the last month",
+            "You have a sex playlist",
+            "You like a nasty blowjob",
+            "Your favorite position is doggy",
+            "You had sex with more than one person the same day",
+            "You are the horniest",
+            "You last longest",
+            "You tasted your own cum",
+            "Had sex with the same gender",
+            "You like a quickie",
+            "You love high sex",
+            "You love drunk sex",
+            "You like spanking",
+            "You used a fruit as a sex toy",
+            "You came at the same time",
+            "You are obsessed with his dick",
+            "You have tried BDSM",
+            "You would consider trying swinging",
+            "You moan the loudest",
+            "You have had car sex",
+            "You already had an orgasm today",
+            "You would try having a threesome",
+            "You have been caught having sex",
+            "You had sex on a beach",
+            "You had sex in an airplane",
+            "You had sex in a nightclub",
+            "You like it in the ass",
+            "You have had bondage sex",
+            "You prefer oral sex over pussy sex",
+            "You like name calling during sex",
+            "You're the best kisser",
+            "You fucked more than 4 times in one day",
+            "You had sex in front of a mirror",
+            "You had sex in the ocean",
+            "You masturbate more than 4 times a week",
+            "You ever made a porno movie",
+            "You ever fucked your friend's Ex",
+            "You had sex fantasies about the other gender",
+            "You had sex in public",
+            "You ever had sex with someone twice your age",
+            "You ever flirted with your partner's friend",
+            "You ever came in your dream",
+            "You ever had an erotic photoshoot",
+            "You had shower sex",
+            "You had a porno party",
+            "You had a sexual script",
+            "You swap roles with your partner",
+            "You had a date night in a bathtub",
+            "You like morning sex",
+            "You had sex on viagra",
+            "You have a secret sex toy",
+            "You have had sex on a flight",
+            "You prefer watching people having sex",
+            "You have given or received a golden shower",
+            "You have had a foursome",
+            "You ever kissed a friends ex",
+            "You ever been kicked out from a nightclub",
+            "You have been tied up with a blindfold",
+            "You have been choked on and spat on",
+            "You have had sex during a period",
+            "You have a secret sex fetish",
+            "You have bribed someone",
+            "You enjoy giving pleasure",
+            "Your body count is over 50",
+            "You had a flirt with your girlfriends mum",
+            "You like hardcore sex",
+            "You like to get or give a nasty blowjob with that hawk tuah",
+            "You had sex infront of a mirror",
+            "You've ever put a butt plug or a thumb in your ass while having sex"
+        ];
+
+        const sinCards = [
+            { description: "Give him a nasty blowjob with that hawk tuah", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Put on high heels and ride him", genderDoing: "F", genderReceiving: "M" },
+            { description: "Film yourself while he's fucking you from behind", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Give him a deepthroat", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Give him head while fingering his ass", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Give him head while you gently play with his balls", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Tie him and ride him in reverse cowgirl position", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Film yourself when he's fucking you in the mirror", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Twerk on his face", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Tie him up and seduce him slowly", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Touch your clit while riding his dick", genderDoing: "F", genderReceiving: "M" },
+            { description: "Let him suck your finger and imitate the same sucking on his dick", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Pick an outfit for him to wear", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Give him a sexy foot massage on his genitals", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Ride him while sitting on your tippy toes", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Give him a handjob using both hands", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Put on your sexiest lingerie", genderDoing: "F", genderReceiving: "M" },
+            { description: "Spit on his dick", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Suck on his balls", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Show your best lap dance", genderDoing: "F", genderReceiving: "M" },
+            { description: "Take a picture of him eating your pussy", genderDoing: "F", genderReceiving: "M" },
+            { description: "Lube his dick up well", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Tell him your favorite thing to do in bed", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Perform a nude catwalk", genderDoing: "MF", genderReceiving: "M" },
+            { description: "Put your finger inside her and taste it", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Use a vibrator on her clit while eating her pussy", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Pleasure her with an ice cube in your mouth until it melts away", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Finger her and let her suck them", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Finger her ass and taste it", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Fuck her on the kitchen table", genderDoing: "M", genderReceiving: "F" },
+            { description: "Blindfold yourself and do everything she says", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Give her a kiss on the clit", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Hold her head and fuck her in the mouth", genderDoing: "M", genderReceiving: "F" },
+            { description: "Lick her ass and put your tongue in there", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Touch her G spot using 3 fingers", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Bend her, spank her", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Make her come with your mouth only", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Breathe warm air into her mouth and kiss her slowly", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Lick up whip cream from her pussy", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Tell her your wildest sex fantasy", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Place her face down on a table and take her from behind", genderDoing: "M", genderReceiving: "F" },
+            { description: "Kiss your favorite part of her body", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Kiss the part of her body where you want to cum", genderDoing: "M", genderReceiving: "F" },
+            { description: "Rub your dick along her opening without going inside", genderDoing: "M", genderReceiving: "F" },
+            { description: "Take a picture of her pussy and put it on your lock screen", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Spit on her pussy", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Pick an outfit for her to wear", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Lick her nipples", genderDoing: "MF", genderReceiving: "F" },
+            { description: "Pleasure yourself while your partner watches", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Take off one item of clothing", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Try 2 sex positions in front of a mirror", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Put on your favorite porn", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Play hide and seek naked", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Pleasure yourself and be very vocal", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "69 for 69 seconds", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Create a new sex position", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Receive a naked massage", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Suck on all of their toes", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Take one sip each", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Give your most sensual kiss", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Lick and Suck their ear", genderDoing: "MF", genderReceiving: "MF" },
+            { description: "Open the windows for the rest of the game", genderDoing: "MF", genderReceiving: "MF" }
+        ];
+
+        let players = [];
+        let currentPlayerIndex = 0;
+        let selectedOpponentIndex = 0;
+        let playerOpponents = {};
+
+        window.onload = function() {
+            try {
+                const storedPlayers = localStorage.getItem('players');
+                const storedOpponents = localStorage.getItem('playerOpponents');
+                if (storedPlayers) {
+                    players = JSON.parse(storedPlayers);
+                }
+                 if (storedOpponents) {
+                    playerOpponents = JSON.parse(storedOpponents);
+                }
+                if (players.length > 0) {
+                    currentPlayerIndex = 0;
+                    selectedOpponentIndex = 0;
+                }
+            } catch (error) {
+                console.error("Error accessing localStorage:", error);
+                result.textContent = "Error: Could not retrieve player data. Please ensure your browser allows local storage.";
+                sipOrSinButton.disabled = true;
+            }
+            displayCard();
+        };
+
+        function getRandomOpponent() {
+            if (players.length === 0) return null;
+
+            const currentPlayerName = players[currentPlayerIndex]?.name;
+            let potentialOpponents = playerOpponents[currentPlayerName];
+
+            if (!potentialOpponents || potentialOpponents.length === 0) {
+                potentialOpponents = [];
+                for (let i = 0; i < players.length; i++) {
+                    if (i !== currentPlayerIndex) {
+                        potentialOpponents.push(players[i].name);
+                    }
+                }
+                if (potentialOpponents.length === 0) {
+                    return currentPlayerIndex;
+                }
+            }
+            const randomOpponentName = potentialOpponents[Math.floor(Math.random() * potentialOpponents.length)];
+            selectedOpponentIndex = players.findIndex(p => p.name === randomOpponentName);
+            return selectedOpponentIndex;
+        }
+
+        function getPlayerGender(playerName) {
+            const player = players.find(p => p.name === playerName);
+            return player ? player.gender : null;
+        }
+
+        function displayCard() {
+            if (players.length === 0) {
+                result.textContent = "No players found. Please add players to start the game.";
+                return;
+            }
+
+            const randomChoice = Math.random();
+            result.innerHTML = '';
+
+            if (randomChoice < 0.5) { // 50% chance for Sip
+                const randomSipCard = sipCards[Math.floor(Math.random() * sipCards.length)];
+                result.innerHTML = `<h2>${players[currentPlayerIndex].name}</h2><p class="sip-text">Sip if:</p><p>${randomSipCard}</p>`;
+            } else { // 50% chance for Sin
+                const currentPlayerName = players[currentPlayerIndex]?.name;
+                const currentPlayerGender = getPlayerGender(currentPlayerName);
+                const opponentIndex = getRandomOpponent();
+                const opponentName = players[opponentIndex]?.name;
+                const opponentGender = getPlayerGender(opponentName);
+
+                 if (opponentIndex === null) {
+                    result.textContent = "No other players available.";
+                    return;
+                }
+
+                const validSinCards = sinCards.filter(card =>
+                    (card.genderDoing === 'MF' || card.genderDoing === currentPlayerGender) &&
+                    (card.genderReceiving === 'MF' || card.genderReceiving === opponentGender)
+                );
+
+                if (validSinCards.length === 0) {
+                    result.textContent = "No suitable sin card found.";
+                    return;
+                }
+
+                const randomSinCard = validSinCards[Math.floor(Math.random() * validSinCards.length)];
+                //let displayString = `<h2>${currentPlayerName}</h2><p class="opponent-text">${currentPlayerName} to ${opponentName}</p><p class="sin-text">${randomSinCard.description}</p><p>SIN</p>`;
+                let displayString = `<h2>${currentPlayerName}</h2><p class="opponent-text">${currentPlayerName} to ${opponentName}</p><p class="sin-text">${randomSinCard.description}</p><p></p><p class="sin-bottom">SIN</p>`; // added class sin-bottom
+                result.innerHTML = displayString;
+            }
+        }
+
+        sipOrSinButton.addEventListener('click', () => {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            displayCard();
+        });
+    </script>
+</body>
+</html>

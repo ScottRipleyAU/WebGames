@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .game-button {
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .game-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 3px 6px -1px rgba(0, 0, 0, 0.08);
+        }
+        .game-button-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.2s ease-in-out;
+        }
+        .game-button:hover .game-button-content {
+            opacity: 1; /* Show on hover */
+        }
+        .game-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .game-description {
+            font-size: 0.875rem;
+            color: #4a5568;
+            text-align: center;
+            padding: 0 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-purple-400 to-pink-500 h-screen flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center bg-gradient-to-r from-indigo-500 to-blue-500 text-transparent bg-clip-text">Select a Game</h2>
+            <button onclick="window.location.href='opponents.html'" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm">
+                Back
+            </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <button class="game-button" style="background-image: url('https://placehold.co/400x300/EEE/31343C?text=Never+Have+I+Ever&font=Montserrat');" onclick="startGame('never-have-i-ever/index.html')">
+                <div class="game-button-content">
+                    <h3 class="game-title">Never Have I Ever</h3>
+                    <p class="game-description">Share your experiences... or not!</p>
+                </div>
+            </button>
+            <button class="game-button" style="background-image: url('https://placehold.co/400x300/EEE/31343C?text=Daring+Dice&font=Montserrat');" onclick="startGame('daring-dice/index.html')">
+                <div class="game-button-content">
+                    <h3 class="game-title">Daring Dice</h3>
+                    <p class="game-description">Roll the dice and take on a dare!</p>
+                </div>
+            </button>
+            <button class="game-button" style="background-image: url('https://placehold.co/400x300/EEE/31343C?text=Truth+or+Dare&font=Montserrat');" onclick="startGame('truth-or-dare/index.html')">
+                <div class="game-button-content">
+                    <h3 class="game-title">Truth or Dare</h3>
+                    <p class="game-description">A fun party game to get to know each other.</p>
+                </div>
+            </button>
+            <button class="game-button" style="background-image: url('https://placehold.co/400x300/EEE/31343C?text=Most+Likely&font=Montserrat');" onclick="startGame('most-likely/index.html')">
+                <div class="game-button-content">
+                    <h3 class="game-title">Most Likely</h3>
+                    <p class="game-description">Who is most likely to do what?</p>
+                </div>
+            </button>
+            <button class="game-button" style="background-image: url('https://placehold.co/400x300/EEE/31343C?text=Sip+or+Sin&font=Montserrat');" onclick="startGame('sip-or-sin/index.html')">
+                <div class="game-button-content">
+                    <h3 class="game-title">Sip or Sin</h3>
+                    <p class="game-description">Confess your sins or take a sip!</p>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function startGame(game) {
+            // Store the selected game in localStorage
+            localStorage.setItem('selectedGame', game);
+            // Redirect to the game's page
+            window.location.href = game;
+        }
+
+
+    </script>
+</body>
+</html>

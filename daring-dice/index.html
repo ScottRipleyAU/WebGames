@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Three Dice Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="container">
+        <button class="back-button" onclick="window.location.href='../gameplay.html'">Back</button>
+        <div id="player-instruction" class="player-instruction" style="display: none;"></div>
+        <div class="dice-row">
+            <div class="dice-container">
+                <div class="dice-label" style="color: #2980b9;">Action</div>
+                <div class="dice" id="dice1">
+                    <div class="face front"><span style="color: #3498db;">Blow On</span></div>
+                    <div class="face back"><span style="color: #3498db;">Lick</span></div>
+                    <div class="face top"><span style="color: #3498db;">Kiss</span></div>
+                    <div class="face bottom"><span style="color: #3498db;">Stroke</span></div>
+                    <div class="face right"><span style="color: #3498db;">Suck</span></div>
+                    <div class="face left"><span style="color: #3498db;">Tickle</span></div>
+                </div>
+            </div>
+            <div class="dice-container">
+                <div class="dice-label" style="color: #27ae60;">Body Part</div>
+                <div class="dice" id="dice2">
+                    <div class="face front"><span style="color: #2ecc71;">Penis or Clitoris</span></div>
+                    <div class="face back"><span style="color: #2ecc71;">Back</span></div>
+                    <div class="face top"><span style="color: #2ecc71;">Face</span></div>
+                    <div class="face bottom"><span style="color: #2ecc71;">Inner Thigh</span></div>
+                    <div class="face right"><span style="color: #2ecc71;">Chest</span></div>
+                    <div class="face left"><span style="color: #2ecc71;">Lips</span></div>
+                </div>
+            </div>
+            <div class="dice-container">
+                <div class="dice-label" style="color: #8e44ad;">Time</div>
+                <div class="dice" id="dice3">
+                    <div class="face front"><span style="color: #9b59b6;">1 sec</span></div>
+                    <div class="face back"><span style="color: #9b59b6;">2 sec</span></div>
+                    <div class="face top"><span style="color: #9b59b6;">5 sec</span></div>
+                    <div class="face bottom"><span style="color: #9b59b6;">10 sec</span></div>
+                    <div class="face right"><span style="color: #9b59b6;">15 sec</span></div>
+                    <div class="face left"><span style="color: #9b59b6;">Choose</span></div>
+                </div>
+            </div>
+        </div>
+        <button class="roll">Roll Dice</button>
+    </div>
+    <script>
+        const dice1 = document.querySelector('#dice1');
+        const dice2 = document.querySelector('#dice2');
+        const dice3 = document.querySelector('#dice3');
+        const rollBtn = document.querySelector('.roll');
+        const playerInstructionDisplay = document.querySelector('#player-instruction');
+
+        let players = [];
+        let currentPlayerIndex = 0;
+        let selectedOpponentIndex = 0;
+        let playerOpponents = {}; // To store the opponent data
+
+        window.onload = function() {
+            try {
+                const storedPlayers = localStorage.getItem('players');
+                const storedOpponents = localStorage.getItem('playerOpponents');
+
+                if (storedPlayers) {
+                    try {
+                        players = JSON.parse(storedPlayers);
+                    } catch (e) {
+                        console.error("Error parsing players from localStorage", e);
+                        players = [];
+                        localStorage.removeItem('players');
+                        playerInstructionDisplay.textContent = "Error: Invalid player data. Please add players again.";
+                        rollBtn.disabled = true;
+                        return;
+                    }
+                }
+
+                if (storedOpponents) {
+                    try {
+                        playerOpponents = JSON.parse(storedOpponents);
+                    } catch (e) {
+                        console.error("Error parsing player opponents from localStorage", e);
+                        playerOpponents = {};
+                        localStorage.removeItem('playerOpponents');
+                        playerInstructionDisplay.textContent = "Error: Invalid opponent data. Please select opponents again.";
+                        rollBtn.disabled = true;
+                        return;
+                    }
+                }
+
+                if (players.length > 0) {
+                    currentPlayerIndex = 0;
+                    // Ensure selectedOpponentIndex is valid
+                    
+                    //pickRandomOpponent();
+                    //displayPlayerInstruction();
+                } else {
+                    playerInstructionDisplay.textContent = "No players found. Please add players to start the game.";
+                    rollBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error("Error accessing localStorage:", error);
+                playerInstructionDisplay.textContent = "Error: Could not retrieve player data. Please ensure your browser allows local storage.";
+                rollBtn.disabled = true;
+            }
+        };
+
+        function displayPlayerInstruction() {
+            if (players.length > 0) {
+                const currentPlayerName = players[currentPlayerIndex]?.name;
+                const opponentName = players[selectedOpponentIndex]?.name;
+
+                if (currentPlayerName && opponentName) {
+                    const instructionText = `<span style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: #000;">${currentPlayerName}</span> <span style="font-family: 'Montserrat', sans-serif; font-size: 2rem;"> to </span> <span style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: #000;">${opponentName}</span>`;
+                    playerInstructionDisplay.innerHTML = instructionText;
+                    playerInstructionDisplay.style.display = "block";
+                } else {
+                    playerInstructionDisplay.textContent = "Error: Player names not found.";
+                    console.error("Error: Player names not found.");
+                    playerInstructionDisplay.style.display = "block";
+                }
+            } else {
+                playerInstructionDisplay.textContent = "No players found.";
+                playerInstructionDisplay.style.display = "block";
+            }
+        }
+
+        function rollAllDice() {
+            if (players.length === 0) {
+                playerInstructionDisplay.textContent = "No players found. Please add players to start the game.";
+                return;
+            }
+
+            rollDice(dice1);
+            rollDice(dice2);
+            rollDice(dice3);
+
+            setTimeout(() => {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                pickRandomOpponent(); // Pick a new opponent each round
+                displayPlayerInstruction();
+            }, 1000);
+        }
+
+        function rollDice(dice) {
+            const random = Math.floor(Math.random() * 6) + 1;
+            dice.style.animation = `rolling 1s ease`;
+
+            setTimeout(() => {
+                dice.style.animation = 'none';
+                switch (random) {
+                    case 1:
+                        dice.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                        break;
+                    case 6:
+                        dice.style.transform = 'rotateX(180deg) rotateY(0deg)';
+                        break;
+                    case 2:
+                        dice.style.transform = 'rotateX(-90deg) rotateY(0deg)';
+                        break;
+                    case 5:
+                        dice.style.transform = 'rotateX(90deg) rotateY(0deg)';
+                        break;
+                    case 3:
+                        dice.style.transform = 'rotateX(0deg) rotateY(90deg)';
+                        break;
+                    case 4:
+                        dice.style.transform = 'rotateX(0deg) rotateY(-90deg)';
+                        break;
+                    default:
+                        break;
+                }
+            }, 950);
+        };
+
+        function pickRandomOpponent() {
+            const currentPlayerName = players[currentPlayerIndex]?.name;
+            let potentialOpponents = playerOpponents[currentPlayerName];
+
+             if (!potentialOpponents || potentialOpponents.length === 0) {
+                // If no opponents are defined for this player, pick anyone else
+                potentialOpponents = [];
+                for (let i = 0; i < players.length; i++) {
+                    if (i !== currentPlayerIndex) {
+                         potentialOpponents.push(players[i].name);
+                    }
+                }
+                if (potentialOpponents.length === 0){
+                    selectedOpponentIndex = currentPlayerIndex;
+                    return;
+                }
+            }
+            const randomOpponentName = potentialOpponents[Math.floor(Math.random() * potentialOpponents.length)];
+            selectedOpponentIndex = players.findIndex(p => p.name === randomOpponentName);
+        }
+
+        rollBtn.addEventListener('click', rollAllDice);
+    </script>
+</body>
+
+</html>

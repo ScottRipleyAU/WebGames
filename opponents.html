@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opponent Selection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-pink-400 to-purple-500 h-screen flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md transition-transform hover:scale-105">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center bg-gradient-to-r from-indigo-500 to-blue-500 text-transparent bg-clip-text">Opponent Selection</h2>
+        <div id="opponent-selection" class="space-y-4 mb-6">
+            </div>
+        <div class="flex justify-between">
+            <button id="back-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300 text-lg">Back</button>
+            <button id="next-button" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition-colors duration-300 text-lg">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const opponentSelectionDiv = document.getElementById('opponent-selection');
+        const nextButton = document.getElementById('next-button');
+        const backButton = document.getElementById('back-button');
+
+        const players = JSON.parse(localStorage.getItem('players'));
+        const savedOpponents = localStorage.getItem('playerOpponents') ? JSON.parse(localStorage.getItem('playerOpponents')) : {};
+
+        function generateOpponentCheckboxes() {
+            opponentSelectionDiv.innerHTML = ''; // Clear previous content
+            players.forEach((player, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'space-y-2 p-4 rounded-lg bg-gray-50';
+
+                const playerLabel = document.createElement('h3');
+                playerLabel.textContent = `${player.name} - Select Opponents:`;
+                playerLabel.className = 'text-lg font-semibold text-gray-800';
+                playerDiv.appendChild(playerLabel);
+
+                const opponentCheckboxesDiv = document.createElement('div');
+                opponentCheckboxesDiv.className = 'flex flex-wrap gap-2';
+
+                players.forEach(otherPlayer => {
+                    if (player.name !== otherPlayer.name) {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `opponent-${player.name}-${otherPlayer.name}`;
+                        checkbox.name = `opponent-${player.name}`;
+                        checkbox.value = otherPlayer.name;
+                        checkbox.className = 'mr-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5';
+
+                        const label = document.createElement('label');
+                        label.htmlFor = `opponent-${player.name}-${otherPlayer.name}`;
+                        label.textContent = otherPlayer.name;
+                        label.className = 'mr-2 text-gray-700';
+
+                        // Check if this opponent was previously selected
+                        if (savedOpponents[player.name] && savedOpponents[player.name].includes(otherPlayer.name)) {
+                            checkbox.checked = true;
+                        }
+
+                        opponentCheckboxesDiv.appendChild(checkbox);
+                        opponentCheckboxesDiv.appendChild(label);
+                    }
+                });
+
+                playerDiv.appendChild(opponentCheckboxesDiv);
+                opponentSelectionDiv.appendChild(playerDiv);
+            });
+        }
+
+        // Initial generation of checkboxes
+        generateOpponentCheckboxes();
+
+        nextButton.addEventListener('click', () => {
+            const playerOpponents = {};
+            players.forEach(player => {
+                const selectedOpponents = [];
+                const opponentCheckboxes = document.querySelectorAll(`input[name="opponent-${player.name}"]:checked`);
+                opponentCheckboxes.forEach(checkbox => {
+                    selectedOpponents.push(checkbox.value);
+                });
+                playerOpponents[player.name] = selectedOpponents;
+            });
+
+            localStorage.setItem('playerOpponents', JSON.stringify(playerOpponents));
+            window.location.href = 'gameplay.html';
+        });
+
+        backButton.addEventListener('click', () => {
+            // No need to resave playerOpponents here, just go back.
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Most Likely To - Sexy Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            width: 80%;
+            max-width: 400px; /* Changed max-width to 400px */
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 1rem;
+            box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15), 0 3px 7px -2px rgba(0, 0, 0, 0.07);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #e63946;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        #statement {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            line-height: 1.75;
+            color: #333;
+            padding: 0 1rem;
+        }
+        button {
+            padding: 0.8rem 1.8rem;
+            font-size: 1.1rem;
+            border-radius: 0.5rem;
+            color: white;
+            background-color: #f72585;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin: 0.5rem;
+        }
+        button:hover {
+            background-color: #d90429;
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 3px 6px -1px rgba(0, 0, 0, 0.08);
+        }
+        .hidden {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .back-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: #f72585; /* Changed back button color to pink */
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #d90429; /* Changed back button hover color to dark red */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-100 to-purple-300 min-h-screen flex justify-center items-center p-4">
+    <div class="container fade-in">
+        <h1 class="text-center">Most Likely To - Sexy Edition</h1>
+        <button class="back-button" onclick="window.location.href='../gameplay.html'">Back</button>
+        <p id="statement" class="text-center">Loading...</p>
+        <button id="nextButton" class="next-btn">Get a Statement</button>
+    </div>
+
+    <script>
+        const statements = [
+            "Most likely to send a nude photo to the wrong person?",
+            "Most likely to initiate sex in a public place?",
+            "Most likely to try a new sexual position?",
+            "Most likely to have a one-night stand with a stranger?",
+            "Most likely to use a dating app for a hookup?",
+            "Most likely to have a threesome?",
+            "Most likely to have a workplace romance?",
+            "Most likely to be caught having sex in a car?",
+            "Most likely to use a sex toy in public?",
+            "Most likely to have a sexual dream about a friend's partner?",
+            "Most likely to send a risqué text message to a family member?",
+            "Most likely to experiment with bondage?",
+            "Most likely to have a shower with multiple people?",
+            "Most likely to give or receive a lap dance?",
+            "Most likely to have a sexual encounter in an elevator?",
+            "Most likely to blindfold their partner during sex?",
+            "Most likely to use food as part of foreplay?",
+            "Most likely to engage in phone sex with a stranger?",
+            "Most likely to fake an orgasm...badly?",
+            "Most likely to have a quickie in a changing room?",
+            "Most likely to wear lingerie in public?",
+            "Most likely to suggest a sex vacation?",
+            "Most likely to have a tattoo in a provocative place?",
+            "Most likely to crash a sexy party",
+            "Most likely to seduce a virgin",
+            "Most likely to have a threesome",
+            "Most likely to have a one night stand",
+            "Most likely to get freaky in a public bathroom",
+            "Most likely to try dirty talk in a foreign language",
+            "Most likely to use a sex toy in public",
+            "Most likely to send a sext to your mom",
+            "Most likely to have a sexual dream about their boss",
+            "Most likely to get caught having sex at work",
+            "Most likely to have a sexual encounter with a stranger",
+            "Most likely to try role-playing in the bedroom",
+            "Most likely to experiment with bondage or S&M",
+            "Most likely to have a sexual relationship with a co-worker",
+            "Most likely to have a threesome with twins",
+            "Most likely to have a sexual experience in a public place",
+            "Most likely to use dating apps for hookups",
+            "Most likely to have a friends with benefits situation",
+            "Most likely to have a sexual bucket list",
+            "Most likely to have a sexual fantasy involving a celebrity",
+            "Most likely to have a secret sexual playlist",
+            "Most likely to have a sexual nickname",
+            "Most likely to have a go-to sexual move",
+            "Most likely to have a sexual ritual before getting intimate",
+            "Most likely to have a signature sexual scent",
+            "Most likely to have a specific sexual aesthetic",
+            "Most likely to have a collection of sexy lingerie or toys",
+            "Most likely to have a preferred sexual position",
+        ];
+
+        const usedStatements = [];
+
+        const statementDisplay = document.getElementById("statement");
+        const nextButton = document.getElementById("nextButton");
+
+
+        nextButton.addEventListener("click", () => {
+            if (statements.length === 0) {
+                statementDisplay.textContent = "No more statements available.  Please refresh the page for a new game.";
+                nextButton.disabled = true;
+                return;
+            }
+
+            if (usedStatements.length >= statements.length) {
+                usedStatements.length = 0;
+            }
+            let randomStatement;
+            let statementIndex;
+            do {
+                statementIndex = Math.floor(Math.random() * statements.length);
+                randomStatement = statements[statementIndex];
+            } while (usedStatements.includes(statementIndex));
+            usedStatements.push(statementIndex);
+            statementDisplay.textContent = randomStatement;
+            nextButton.textContent = "Next Statement";
+        });
+    </script>
+</body>
+</html>
