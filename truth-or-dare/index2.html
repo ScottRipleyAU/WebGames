@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth or Dare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #result {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            max-width: 300px;
+            height: 400px;
+            border-radius: 16px;
+            border: 2px solid #e5e7eb;
+            background-color: #f0f4f8;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 2rem;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.1rem;
+            color: #4b5563;
+        }
+        #result h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .opponent-text {
+            font-weight: 600;
+            color: #6366f1;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .text-category {
+            font-weight: 800;
+            color: #10b981;
+            display: block;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-pink-400 to-purple-500 h-screen flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md transition-transform hover:scale-105 relative">
+        <button class="back-button absolute top-4 right-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300 text-lg" onclick="window.location.href='../gameplay.html'">Back</button>
+        <h2 id="current-player-title" class="text-2xl font-bold text-gray-800 mb-4 text-center"></h2>
+        
+        <div class="flex justify-center items-center gap-4 mb-4">
+            <button id="truth-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-colors duration-300 text-xl">
+                Truth
+            </button>
+            <button id="dare-button" class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-colors duration-300 text-xl">
+                Dare
+            </button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="flex justify-center mt-4">
+            <button id="next-player-button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition-colors duration-300 text-xl">
+                Next Player
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const truthButton = document.getElementById('truth-button');
+        const dareButton = document.getElementById('dare-button');
+        const nextPlayerButton = document.getElementById('next-player-button');
+        const result = document.getElementById('result');
+        const playerNameDisplay = document.getElementById('current-player-title');
+
+        // State
+        let players = [];
+        let currentPlayerIndex = 0;
+        let selectedIntensity = 'medium';
+        let playerOpponents = {};
+
+        // Question Arrays (kept your existing lists)
+        const lightDares = ["Give a shoulder massage to the person on your left.", "Hug the person across from you for 10 seconds.", "Hold hands with the person to your right.", "Give a compliment to everyone in the group.", "Stroke the hair of the person to your left.", "Give a gentle back scratch to the person on your right.", "Wrap your arm around the person next to you.", "Share a warm hug with someone of your choice.", "Hold someone's hand and tell them something you appreciate about them.", "Give a brief shoulder squeeze to the person across from you.", "Give a playful peck on the cheek to the person on your left.", "Do a silly dance for 30 seconds.", "Imitate an animal and have others guess what it is.", "Tell a funny joke.", "Sing a children's song in a dramatic voice.", "Try to make someone laugh without smiling yourself.", "Give a foot massage to the person on your right.", "Draw a funny picture of someone in the group.", "Read a short poem with exaggerated emotions.", "Do a magic trick (even a simple one).", "Serenade someone with a made-up song.", "Act like a famous movie character.", "Give a piggyback ride to someone for a short distance.", "Make a paper hat for someone and have them wear it.", "Teach everyone a simple dance move.", "Tell a story using only gestures.", "Organize a group game.", "Offer a sincere apology to someone.", "Write a short, funny commercial.", "Direct a short scene from a movie.", "Give a sensual massage (shoulders/back).", "Slow dance for one minute.", "Feed a piece of food using only your mouth.", "Blindfold someone and describe body parts using touch.", "Trace your fingers slowly on someone's arm.", "Give a lap dance.", "Kiss someone's neck slowly.", "Whisper something seductive.", "Caress someone's cheek for 30 seconds.", "Give a sensual hand massage."];
+        const mediumDares = ["Give a passionate kiss.", "Role-play a romantic scene.", "Give a striptease (remove a few items).", "Tie someone up gently and tease them.", "Give a lap dance while blindfolded.", "Serenade someone with a sexy song.", "Give a sensual massage using warm oil.", "Describe your ideal romantic encounter.", "Perform a sensual dance.", "Give a 'come-hither' look.", "Write a short, erotic poem.", "Recreate a famous sexy scene.", "Give a passionate kiss.", "Blindfold someone and feed them various foods.", "Give a body shot.", "Whisper your deepest desires.", "Give a seductive massage focusing on erogenous zones.", "Perform a sensual act on yourself (no nudity).", "Prolonged eye contact challenge.", "Describe the sexiest dream you've ever had.", "Engage in a sensual act with multiple partners.", "Describe your most intense orgasm.", "Perform a sexual act using a prop.", "Have phone sex with someone in the group.", "Full body massage leading to activity.", "Recreate a scene from an explicit movie.", "Engage in an act in a public place.", "Use edible body paint.", "Perform a striptease ending in nudity.", "Engage in a sexual act while being recorded."];
+        const spicyDares = ["Give a provocative massage involving intimate areas.", "Perform a striptease.", "Engage in role-play.", "Give thorough oral pleasure.", "Blindfold partner and explore with mouth.", "Tease with feather or ice cube.", "Give a body shot.", "Describe your most intense fantasy with someone here.", "Use a sex toy.", "Have sex in front of the group (optional).", "Perform a sexual act with passion.", "Engage in activity in a suggestive manner.", "Use ice to explore intimate areas.", "Detailed description of past encounter.", "Role-play dominant/submissive.", "Use restraints and intense teasing.", "Sensual act with multiple partners.", "Describe memorable orgasm.", "Perform sexual act using a prop.", "Phone sex with explicit language.", "Full body massage to climax.", "Recreate explicit movie scene.", "Act in public place (discretion).", "Use edible paint on intimate areas.", "Striptease to complete nudity.", "Sexual act while being recorded.", "Ultimate fantasy involving group.", "Use a vibrator in front of group.", "Participate in group activity.", "Sexually explicit act with a stranger (public/consent)."];
+        const lightTruths = ["What is your favorite non-sexual physical feature?", "What is the most innocent fantasy you've ever had?", "What is your favorite thing to do to relax?", "What is a small gesture that makes you feel loved?", "What is your favorite thing about your body?", "What is the nicest compliment you have ever received?", "What is your favorite childhood memory?", "What is something you find mildly attractive about someone here?", "What is your go-to way to show affection?", "What is a non-sexual thing that turns you on?", "What is your favorite type of hug?", "What is your favorite lazy day activity?", "What is a small thing someone can do to make your day better?", "What is your favorite scent?", "What is your favorite piece of clothing?", "What is a non-sexual thing you find incredibly intimate?", "What is your favorite way to pamper yourself?", "What is your favorite kind of smile?", "What is a non-physical quality you find most attractive?", "What is your favorite way to show you care?", "What is your favorite thing to do outdoors?", "What is your favorite way to be comforted?", "What is a small gesture that makes you feel appreciated?", "What is your favorite non-sexual touch?", "What is your favorite way to connect emotionally?", "What is your favorite thing about friends?", "What is your favorite way to express joy?", "What is a non-sexual thing that makes you feel close?", "What is your favorite way to unwind?", "What is a non-sexual thing you find incredibly attractive?"];
+        const mediumTruths = ["What is the most adventurous sexual experience you've had?", "What is something you've always wanted to try?", "What is your biggest sexual insecurity?", "What is your favorite part of foreplay?", "What is the most daring place you've ever been intimate?", "What is your opinion on open relationships?", "What is the kinkiest thing you've ever done?", "What is your favorite sexual fantasy involving someone here?", "What is the most embarrassing thing during sex?", "What is a sexual deal-breaker?", "What is the most intense sexual experience?", "What is your favorite sex position?", "What is the longest you've gone without sex?", "What is your favorite thing to wear during sex?", "What is your opinion on sexting?", "What is the most creative place you've had sex?", "What is your biggest turn-on?", "What is your favorite way to initiate?", "What is the most awkward encounter?", "What is your opinion on watching porn with a partner?", "What is your favorite fantasy involving a stranger?", "What is the most spontaneous encounter?", "What is your favorite thing to say during sex?", "What is your opinion on role-playing?", "What is the most unusual place you've been turned on?", "What is your favorite way to be touched?", "What is your opinion on PDA?", "What is the most memorable compliment on performance?", "What is your favorite sexual memory?", "What is your opinion on sex toys?"];
+        const spicyTruths = ["What is the dirtiest thing you've said during sex?", "What is your most explicit fantasy?", "Who here would you most like to have an encounter with?", "What is the most taboo thing you're curious about?", "What is your favorite position?", "What is the most intense orgasm?", "What would you only do in BDSM?", "What is your opinion on group sex?", "What is the most shameful encounter?", "What is the one act you can't live without?", "What is the most degrading thing said during sex?", "What is your most detailed sexual dream?", "What is the most risky encounter?", "What is your favorite part of your partner's body to explore?", "What is the most dominant or submissive you've been?", "What is your biggest sexual regret?", "What is the most intense pain during sex?", "What is your opinion on swinging?", "What is the most explicit thing you've witnessed?", "What is your preferred birth control?", "What is the most sexually charged situation?", "What is your favorite way to experiment?", "What is your opinion on polyamory?", "What is the most number of orgasms in one session?", "What is your favorite fantasy involving a specific person?", "What is the most extreme thing for pleasure?", "What is your opinion on exhibitionism?", "What is the most memorable encounter with a stranger?", "What is your biggest turn-off?", "What is the one act you are most curious to try?"];
+
+        window.onload = function() {
+            try {
+                const storedPlayers = localStorage.getItem('players');
+                const storedIntensity = localStorage.getItem('intensity');
+                const storedOpponents = localStorage.getItem('playerOpponents');
+
+                if (storedPlayers) players = JSON.parse(storedPlayers);
+                if (storedIntensity) selectedIntensity = storedIntensity;
+                if (storedOpponents) playerOpponents = JSON.parse(storedOpponents);
+
+                if (players.length > 0) {
+                    currentPlayerIndex = 0;
+                }
+            } catch (error) {
+                console.error("Error accessing localStorage:", error);
+                result.textContent = "Error: Could not retrieve player data.";
+            }
+            updatePlayerName();
+        };
+
+        function getRandomItem(array) {
+            if (array.length === 0) return "No items available";
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        // Logic from your other page to find a valid partner
+        function getRandomOpponent() {
+            if (players.length === 0) return null;
+
+            const currentPlayerName = players[currentPlayerIndex]?.name;
+            let potentialOpponents = playerOpponents[currentPlayerName];
+
+            // If no specific partner preferences, allow anyone except current player
+            if (!potentialOpponents || potentialOpponents.length === 0) {
+                potentialOpponents = [];
+                for (let i = 0; i < players.length; i++) {
+                    if (i !== currentPlayerIndex) {
+                        potentialOpponents.push(players[i].name);
+                    }
+                }
+                if (potentialOpponents.length === 0) return null;
+            }
+
+            const randomOpponentName = potentialOpponents[Math.floor(Math.random() * potentialOpponents.length)];
+            return players.findIndex(p => p.name === randomOpponentName);
+        }
+
+        function displayCard(type) {
+            if (players.length === 0) {
+                result.textContent = "No players found.";
+                return;
+            }
+
+            const opponentIndex = getRandomOpponent();
+            if (opponentIndex === null) {
+                result.textContent = "No other players available to partner with.";
+                return;
+            }
+
+            const currentPlayerName = players[currentPlayerIndex].name;
+            const opponentName = players[opponentIndex].name;
+
+            let chosenText = '';
+            let category = type === 'truth' ? "TRUTH" : "DARE";
+            
+            const bank = {
+                truth: { light: lightTruths, medium: mediumTruths, spicy: spicyTruths },
+                dare: { light: lightDares, medium: mediumDares, spicy: spicyDares }
+            };
+
+            chosenText = getRandomItem(bank[type][selectedIntensity]);
+
+            result.innerHTML = `
+                <p class="text-category">${category}</p>
+                <p class="opponent-text">${currentPlayerName} TO ${opponentName}</p>
+                <p>${chosenText}</p>
+            `;
+        }
+
+        function updatePlayerName() {
+            if (players.length > 0) {
+                playerNameDisplay.textContent = `${players[currentPlayerIndex].name}'s Turn`;
+            } else {
+                playerNameDisplay.textContent = "Truth or Dare";
+            }
+        }
+
+        truthButton.addEventListener('click', () => displayCard('truth'));
+        dareButton.addEventListener('click', () => displayCard('dare'));
+
+        nextPlayerButton.addEventListener('click', () => {
+            if (players.length > 0) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                updatePlayerName();
+                result.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
