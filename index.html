@@ -143,7 +143,7 @@ textarea{min-height:96px;resize:vertical}
    {a} {b} {c} are filled with player names.
    G+B: a = female, b = male.  G+G+B: a,b = female, c = male.  B+B+G: a,b = male, c = female. */
 var ROLES={'G':['F'],'B':['M'],'G+G':['F','F'],'G+B':['F','M'],'G+G+B':['F','F','M'],'B+B+G':['M','M','F']};
-var TAGS={'G':'Solo','B':'Solo','G+B':'Duo','G+G+B':'Trio','B+B+G':'Trio'};
+var TAGS={'G':'Solo','B':'Solo','G+G':'Duo','G+B':'Duo','G+G+B':'Trio','B+B+G':'Trio'};
 var LEVELS=['Low','Medium','High'];
 var BANK={
 'G':{
@@ -151,6 +151,7 @@ low:[
 '{a}, caress your own chest under your top for the group to watch',
 '{a}, have someone trace a letter on your neck with their tongue. If you guess correctly, they drink. If not, you drink',
 '{a}, describe your last sexual dream you can remember',
+'{a}, show the group a pic of the last outfit you wore that made you feel hot.',
 '{a}, what is something guarenteed to get you in the mood',
 '{a}, what is your record for the highest number of orgasms you have had in a day',
 '{a}, if you could only do one sexual position for the rest of your life, which would it be?',
@@ -208,8 +209,8 @@ low:[
 medium:[
 '{a} kiss and lick {b}s bare breasts',
 '{a}, kiss your favorite part of {b}s body',
-'{a} Kiss {b} somewhere unexpected — not lips, not the cheek.',
-'{a}, create a “menu” of three affectionate things {b} can do to you right now. They must choose one and perform it.',
+'{a} Kiss {b} somewhere unexpected - not lips, not the cheek.',
+'{a}, create a "menu" of three affectionate things {b} can do to you right now. They must choose one and perform it.',
 '{b} must sensually remove {a}s top/bra for the group to see. You must keep it off for 2 peoples turns',
 '{b} must sensually remove {a}s pants for the group to see. You must keep it off for 2 peoples turns'
 ],
@@ -222,6 +223,7 @@ low:[
 '{a}, give {b} a slow, sensual 30-second shoulder massage',
 '{a}, kiss {b} sensually for 5 seconds',
 '{b}, kiss the part of {a}s body where you would want to cum',
+'{a}, sit on {b}s lap until it is your turn again',
 '{a} and {b}, make out without your hands touching their body'
 ],
 medium:[
@@ -253,16 +255,19 @@ high:[
 'G+G+B':{
 low:[
 '{a} and {b}, rub your hands all over {c} for 20seconds. Grope anything you would like',
-'{a} and {b} take turns kissing {c} on the lips. 5 seconds per kiss for a total of 4 kisses.'
+'{a} and {c}, rub your hands all over {b} for 20seconds. Grope anything you would like',
+'{a} and {b} take turns kissing {c} on the lips. 5 seconds per kiss for a total of 4 kisses.',
+'{a} and {c} take turns kissing {b} on the lips. 5 seconds per kiss for a total of 4 kisses.'
 ],
 medium:[
 '{a} and {b}, run your hands underneath {c}s clothes for 20 seconds',
+'{a} and {c}, run your hands underneath {b}s clothes for 20 seconds',
 '{a}, {b} and {c}, have a 3-way kiss',
 '{a} and {b}, remove your tops and sit next to each other. {c}, caress your hands across {a} and {b}s chests for 15 seconds. {a} and {b} can put their tops on after.'
 ],
 high:[
 '{a} and {b} get on their knees in front of {c}. Give him a dual blow job for 1 minute',
-'{c}, lay down. {a} must ride {c} while {b} kisses them. If desired, the {b} can sit on {c}s face ',
+'{c}, lay down. {a} must ride {c} while {b} kisses them. If desired, {b} can sit on {c}s face ',
 '{a} and {b} lie down next to each other. {c}, slowly finger both of them for 15 seconds',
 '{a} lie face down on the ground. {b} lie face down on top of {a}. {c} must enter them both from behind, one after the other for 5 thrusts each '
 ]},
