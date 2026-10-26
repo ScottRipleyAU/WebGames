@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pass the Dare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light}
+/* Layout: one centred column that walks through three stages: players, who plays with whom, then the dare card with a heat meter. */
+:root{
+  --bg:#F4F2F9;
+  --surface:#FFFFFF;
+  --ink:#1D1530;
+  --muted:#6B6280;
+  --line:#DDD7EA;
+  --accent:#D62F67;
+  --accent-ink:#FFFFFF;
+  --heat-low:#2E9E78;
+  --heat-mid:#E08A12;
+  --heat-high:#D62F67;
+  --female:#B4408F;
+  --male:#2F72C9;
+  --font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#150F20;--surface:#211832;--ink:#F3EEFB;--muted:#A89DC0;--line:#382C52;
+    --accent:#FF5C8A;--accent-ink:#2A0614;
+    --heat-low:#4FD1A1;--heat-mid:#FFB547;--heat-high:#FF5C8A;
+    --female:#E27BC4;--male:#6FA8F5;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#150F20;--surface:#211832;--ink:#F3EEFB;--muted:#A89DC0;--line:#382C52;
+  --accent:#FF5C8A;--accent-ink:#2A0614;
+  --heat-low:#4FD1A1;--heat-mid:#FFB547;--heat-high:#FF5C8A;
+  --female:#E27BC4;--male:#6FA8F5;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;
+  padding-block:20px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--font-display);font-weight:800;font-size:1.6rem;letter-spacing:-.02em;margin:0}
+.logo span{color:var(--accent)}
+.stage{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h2{font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted);max-width:60ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px;border-radius:10px;font-weight:700;min-height:44px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.small{padding:6px 12px;min-height:36px;font-size:.9rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent}
+input[type=text]{
+  font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;min-height:44px;flex:1 1 140px;min-width:0;
+}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:10px 14px;min-height:44px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"].f{background:var(--female);color:#fff}
+.seg button[aria-pressed="true"].m{background:var(--male);color:#fff}
+.prow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.x{border:0;background:transparent;color:var(--muted);font-size:1.3rem;line-height:1;padding:8px 10px;min-height:44px;border-radius:10px}
+.x:hover{color:var(--accent)}
+.note{font-size:.88rem;color:var(--muted)}
+.err{color:var(--accent);font-weight:700;font-size:.92rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 14px;min-height:40px;font-weight:700;display:inline-flex;gap:8px;align-items:center}
+.chip .dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.chip .dot.f{background:var(--female)}.chip .dot.m{background:var(--male)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
+.who{font-family:var(--font-display);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.who .dot{width:12px;height:12px;border-radius:50%}
+.dot.f{background:var(--female)}.dot.m{background:var(--male)}
+
+/* your dares */
+textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%;min-width:0}
+textarea{min-height:96px;resize:vertical}
+.fl{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:6px;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.grid2{grid-template-columns:1fr}}
+.sw{display:flex;gap:12px;align-items:flex-start}
+.sw input{width:22px;height:22px;margin-top:2px;accent-color:var(--accent);flex:none}
+.sw .t{font-weight:700}
+.mine{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
+.mine p{overflow-wrap:anywhere;min-width:0}
+.gh{font-family:var(--font-display);font-weight:800;font-size:1rem}
+.tok{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700}
+
+/* play */
+.meter{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.pips{display:flex;gap:6px;align-items:center}
+.pip{width:34px;height:10px;border-radius:5px;background:var(--line)}
+.pip.on.l0{background:var(--heat-low)}.pip.on.l1{background:var(--heat-mid)}.pip.on.l2{background:var(--heat-high)}
+.lvl{font-weight:800;font-family:var(--font-display);font-size:1.05rem}
+.order{display:flex;gap:6px;flex-wrap:wrap}
+.o{font-size:.82rem;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.o.now{color:var(--ink);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
+.dare{border-radius:18px;border:2px solid var(--line);background:var(--surface);padding:22px 20px;display:flex;flex-direction:column;gap:16px;border-top:8px solid var(--heat-low)}
+.dare.l1{border-top-color:var(--heat-mid)}.dare.l2{border-top-color:var(--heat-high)}
+.turn{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.turnname{font-family:var(--font-display);font-weight:800;font-size:clamp(1.8rem,7vw,2.6rem);line-height:1.05;letter-spacing:-.02em;margin:0;overflow-wrap:anywhere}
+.tag{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--line);align-self:flex-start}
+.dtext{font-family:var(--font-display);font-weight:600;font-size:clamp(1.25rem,4.6vw,1.7rem);line-height:1.3;margin:0;text-wrap:pretty;overflow-wrap:anywhere}
+.nm{font-weight:800;border-bottom:3px solid var(--line)}
+.nm.f{border-color:var(--female)}.nm.m{border-color:var(--male)}
+.nm.me{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn.primary{flex:1 1 200px}
+.foot{display:flex;gap:8px;flex-wrap:wrap}
+@media (prefers-reduced-motion:no-preference){
+  .dare{animation:pop .22s ease-out}
+  @keyframes pop{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Challenge bank ----------
+   {a} {b} {c} are filled with player names.
+   G+B: a = female, b = male.  G+G+B: a,b = female, c = male.  B+B+G: a,b = male, c = female. */
+var ROLES={'G':['F'],'B':['M'],'G+G':['F','F'],'G+B':['F','M'],'G+G+B':['F','F','M'],'B+B+G':['M','M','F']};
+var TAGS={'G':'Solo','B':'Solo','G+B':'Duo','G+G+B':'Trio','B+B+G':'Trio'};
+var LEVELS=['Low','Medium','High'];
+var BANK={
+'G':{
+low:[
+'{a}, caress your own chest under your top for the group to watch',
+'{a}, have someone trace a letter on your neck with their tongue. If you guess correctly, they drink. If not, you drink',
+'{a}, describe your last sexual dream you can remember',
+'{a}, what is something guarenteed to get you in the mood',
+'{a}, what is your record for the highest number of orgasms you have had in a day',
+'{a}, if you could only do one sexual position for the rest of your life, which would it be?',
+'{a}, what is the hottest sexual experience you have had?',
+'{a}, get on all fours, arch your back and pop your butt out for the group to see. Stay like this for 2 more peoples turns.',
+'{a}, which sex act do you think youre particularly good at?',
+'{a}, when was the last time you self-pleasured.',
+'{a}, where would you most like someone to finish? In you? On you? Where?',
+'{a}, confess the one type of intimate act you would absolutely never try.',
+'{a}, describe the biggest turn-on that has nothing to do with touch.',
+'{a}, given the opportunity, would you let {b} and {c} come on your face/chest while you knelt in front of them?'
+],
+medium:[
+'{a}, flash your chest to the group',
+'{a}, bend over to the group and show your ass (remove pants if wearing them',
+'{a}, lift your top, lick your finger and caress your nipple until it gets hard',
+'{a}, go into another room. Take a naughty photo on your phone. Come out and show everyone, then feel free to delete.',
+'{a}, perform a catwalk in your underwear'
+],
+high:[
+'{a}, pleasure yourself in front of the group for 15 seconds',
+'{a}, get naked and blindfolded in front of the group. Everyone must caress you for 20seconds. You may set any rules/limits you would like.',
+'{a}, perform a nude catwalk'
+]},
+'B':{
+low:[
+'{a}, touch yourself inside your pants for the group to see for 10seconds',
+'{a}, have someone trace a letter on your neck with their tongue. If you guess correctly, they drink. If not, you drink',
+'{a}, describe your last sexual dream you can remember',
+'{a}, what is your record for number of orgasms in a day',
+'{a}, if you could only do one sexual position for the rest of your life, which would it be?',
+'{a}, what is the hottest sexual experience you have had?',
+'{a}, which sex act do you think youre particularly good at?',
+'{a}, where do you most like to finish with a partner? In them? On them? Where?',
+'{a}, when was the last time you self-pleasured.',
+'{a}, confess the one type of intimate act you would absolutely never try.',
+'{a}, describe the biggest turn-on that has nothing to do with touch.'
+],
+medium:[
+'{a}, flash your ass to the group',
+'{a}, remove your shirt for the next 2 persons turns. If your shirt is already off, remove your pants and underwear for the 2 turns.'
+],
+high:[
+'{a}, pleasure yourself in front of the group for 15 seconds',
+'{a}, get naked and blindfolded in front of the group. Everyone must caress you for 20seconds. You may set any rules/limits you would like.'
+]},
+'G+G':{
+low:[
+'{a} kiss {b} sensually for 5 seconds',
+'{a}, make out with {b} without your hands touching their body',
+'{a} fondle {b}s breasts over their clothes',
+'{a} bend {b} over your knee and playfully spank her',
+'{a}, give {b} a slow, sensual 30-second shoulder massage'
+],
+medium:[
+'{a} kiss and lick {b}s bare breasts',
+'{a}, kiss your favorite part of {b}s body',
+'{a} Kiss {b} somewhere unexpected — not lips, not the cheek.',
+'{a}, create a “menu” of three affectionate things {b} can do to you right now. They must choose one and perform it.',
+'{b} must sensually remove {a}s top/bra for the group to see. You must keep it off for 2 peoples turns',
+'{b} must sensually remove {a}s pants for the group to see. You must keep it off for 2 peoples turns'
+],
+high:[
+'{a}, stand/sit behind {b}. Lift their shirt/bra up if wearing one. Delicately kiss {b}s neck while playing with their breast so everyone can watch. Do this for 10seconds',
+'{a} and {b} perform a sensual striptease, removing each others clothes until naked. Once naked, clothes can be put back on.'
+]},
+'G+B':{
+low:[
+'{a}, give {b} a slow, sensual 30-second shoulder massage',
+'{a}, kiss {b} sensually for 5 seconds',
+'{b}, kiss the part of {a}s body where you would want to cum',
+'{a} and {b}, make out without your hands touching their body'
+],
+medium:[
+'{a}, give a 30-second lap dance to {b}',
+'{a}, kiss your favorite part of {b}s body',
+'{a} and {b}, kiss passionately for 10 seconds. Let your hands roam all over each others body',
+'{b}, dry hump {a} in your favorite position',
+'{a}, grope your favorite body part of {b}',
+'{b}, grope your favorite body part of {a}',
+'{a}, kneel in front of {b} while they gently run their cock along your face (inside pants)',
+'{a}, run your breasts lightly along {b}s face',
+'{b}, bend {a} over your knee and spank her bare ass. 5 times. {a} can dictate how hard the spanks are',
+'{a}, rub {b}s cock outside their pants for 30seconds',
+'{b}, rub {a}s crotch outside their pants for 30 seconds'
+],
+high:[
+'{b} must lie down. {a}, rub your vagina up and down their cock without penetration for 15 seconds',
+'{a}, kiss the inner thighs of {b} for 30 seconds or until they quiver',
+'{b}, kiss the inner thighs of {a} for 30 seconds or until they quiver',
+'{a}, take as much of {b}s cock in your mouth as you can',
+'{a}, get on all fours in front of {b}. {b}, tease the outside of {a}s vagina without penetrating for 20seconds',
+'{b}, slowly finger {a} for 15 seconds',
+'{b} lie down. {a} must stand above {b}s crotch. {a} must squat all the way down 5 times. If {b} is hard, allow him to penetrate {a} as she is squatting down.',
+'{b}, sit on a chair without pants in front of the group. {a}, slowly lower yourself onto {b}s cock. Let {b} stay inside {a} for 5 seconds before coming off him.',
+'{a}, run your tongue from the bottom of {b}s shaft, all the way to the top and down again.',
+'{b}, slowly enter {a} from behind while filming. Show the group',
+'{a}, give {b} a 30 second handjob using both hands'
+]},
+'G+G+B':{
+low:[
+'{a} and {b}, rub your hands all over {c} for 20seconds. Grope anything you would like',
+'{a} and {b} take turns kissing {c} on the lips. 5 seconds per kiss for a total of 4 kisses.'
+],
+medium:[
+'{a} and {b}, run your hands underneath {c}s clothes for 20 seconds',
+'{a}, {b} and {c}, have a 3-way kiss',
+'{a} and {b}, remove your tops and sit next to each other. {c}, caress your hands across {a} and {b}s chests for 15 seconds. {a} and {b} can put their tops on after.'
+],
+high:[
+'{a} and {b} get on their knees in front of {c}. Give him a dual blow job for 1 minute',
+'{c}, lay down. {a} must ride {c} while {b} kisses them. If desired, the {b} can sit on {c}s face ',
+'{a} and {b} lie down next to each other. {c}, slowly finger both of them for 15 seconds',
+'{a} lie face down on the ground. {b} lie face down on top of {a}. {c} must enter them both from behind, one after the other for 5 thrusts each '
+]},
+'B+B+G':{
+low:[
+'{c}, kiss {a} sensually while stroking the outside of {b}s pants. Do this for 10seconds then swap.',
+'{c}, grab {a} and {b}s hands and place them wherever you would like on your body for 5 seconds.',
+'{a} lie down on the edge of bed/couch. {c}, straddle {a}. {b}, come up behind {c}. Dry hump a double penetration act for 20 seconds.',
+'{c} stand in the middle of {a} and {b}. They should put one hand on a breast and one hand on an ass cheek each. Caress both for 20 seconds.'
+],
+medium:[
+'{c}, sit between {a} and {b}. Stroke both of their cocks outside the pants for 20 seconds',
+'{c} lies down. {a} and {b}, run your hands all over her body, both outside and inside clothing.',
+'{c}, perform a lap dance for {a} and {b} for 1 minute. {c} can choose the rules for what she dresses down to, and if {a} and {b} are allowed to touch'
+],
+high:[
+'{a} and {b}, remove their pants. {c}, sit between {a} and {b}. Stroke both of their cocks for 1 minute',
+'{c} get on their knees in front of {a} and {b}. Perform oral sex on both of them for 1 minute',
+'{a} and {b}, perform the Eiffel tower with {c} (one B on both ends)',
+'Perform the doggy blowjob ({a} lying down while {c} gives oral and gets penetrated by {b}) for 1 minute',
+'{c} is a goddess. She may choose how long {a} and {b} will worship her body and what she wants them to do to it.'
+]}
+};
+
+/* ---------- State ---------- */
+var uid=0;
+var S={screen:'setup',prev:'setup',players:[],links:{},level:0,turn:0,cur:null,used:{},error:'',custom:{},onlyMine:false,dirty:false,draft:{cat:'G+B',level:'low',text:'',err:''},backup:{text:'',msg:''}};
+var LVKEYS=['low','medium','high'];
+var CATLABEL={'G':'Solo, female (G)','B':'Solo, male (B)','G+B':'One female + one male (G+B)','G+G+B':'Two females + one male (G+G+B)','B+B+G':'Two males + one female (B+B+G)'};
+var ROLEHINT={'G':'{a} is the player on the spot.','B':'{a} is the player on the spot.','G+B':'{a} is the female and {b} is the male.','G+G+B':'{a} and {b} are the two females. {c} is the male.','B+B+G':'{a} and {b} are the two males. {c} is the female.'};
+function saveCustom(){try{localStorage.setItem('pass-the-dare-custom',JSON.stringify({custom:S.custom,onlyMine:S.onlyMine}));}catch(e){}}
+function loadCustom(){try{var d=JSON.parse(localStorage.getItem('pass-the-dare-custom'));if(d){S.custom=d.custom||{};S.onlyMine=!!d.onlyMine;}}catch(e){}}
+function customList(cat,lv){return ((S.custom[cat]||{})[lv])||[];}
+function importDares(raw){
+  var bad='That text is not a valid export. Copy the whole thing and try again.';
+  if(!raw)return 'Paste your exported dares into the box first.';
+  var data;try{data=JSON.parse(raw);}catch(e){return bad;}
+  var src=data&&data.custom;
+  if(!src||typeof src!=='object')return bad;
+  var added=0,skipped=0;
+  Object.keys(src).forEach(function(c){
+    if(!Object.prototype.hasOwnProperty.call(ROLES,c)||!src[c]||typeof src[c]!=='object')return;
+    LVKEYS.forEach(function(l){
+      var list=src[c][l];
+      if(!Array.isArray(list))return;
+      list.forEach(function(t){
+        if(typeof t!=='string')return;
+        t=t.replace(/\s+/g,' ').trim().slice(0,300);
+        if(!t)return;
+        var cur=customList(c,l);
+        if(cur.indexOf(t)>=0){skipped++;return;}
+        S.custom[c]=S.custom[c]||{};
+        S.custom[c][l]=cur.concat([t]);
+        added++;
+      });
+    });
+  });
+  if(added){S.dirty=true;S.used={};saveCustom();}
+  if(added)return 'Added '+added+' dare'+(added===1?'':'s')+(skipped?' ('+skipped+' already in your list)':'')+'.';
+  return skipped?'All of those dares were already in your list.':'No dares found in that text.';
+}
+function customCount(){var n=0;Object.keys(S.custom).forEach(function(c){LVKEYS.forEach(function(l){n+=customList(c,l).length;});});return n;}
+function nextId(){uid+=1;return 'p'+uid;}
+function byId(id){for(var i=0;i<S.players.length;i++){if(S.players[i].id===id)return S.players[i];}return null;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function save(){try{localStorage.setItem('pass-the-dare',JSON.stringify({players:S.players,links:S.links,uid:uid}));}catch(e){}}
+function load(){
+  try{
+    var d=JSON.parse(localStorage.getItem('pass-the-dare'));
+    if(d&&d.players&&d.players.length){S.players=d.players;S.links=d.links||{};uid=d.uid||d.players.length;return true;}
+  }catch(e){}
+  return false;
+}
+function seed(){
+  var ex=[['Alex','F'],['Sam','M'],['Jess','F'],['Ben','M']];
+  S.players=ex.map(function(p){return {id:nextId(),name:p[0],g:p[1]};});
+  S.links={};
+}
+
+/* ---------- Engine ---------- */
+function linkedPlayers(p){
+  return (S.links[p.id]||[]).map(byId).filter(Boolean);
+}
+function feasibleCats(p){
+  var L=linkedPlayers(p);
+  var f=L.filter(function(x){return x.g==='F';}).length;
+  var m=L.length-f;
+  return Object.keys(ROLES).filter(function(k){
+    if(k==='G'||k==='B')return false;
+    var r=ROLES[k].slice();
+    var i=r.indexOf(p.g);
+    if(i<0)return false;
+    r.splice(i,1);
+    var needF=r.filter(function(x){return x==='F';}).length;
+    var needM=r.length-needF;
+    return f>=needF&&m>=needM;
+  });
+}
+function assign(p,cat){
+  var roles=ROLES[cat];
+  var slots=new Array(roles.length);
+  var mine=[];
+  roles.forEach(function(r,i){if(r===p.g)mine.push(i);});
+  slots[mine[rnd(mine.length)]]=p;
+  var pool=shuffle(linkedPlayers(p));
+  roles.forEach(function(r,i){
+    if(slots[i])return;
+    for(var k=0;k<pool.length;k++){
+      if(pool[k].g===r){slots[i]=pool[k];pool.splice(k,1);return;}
+    }
+  });
+  return slots;
+}
+function pickText(cat,list,tag){
+  var key=cat+'|'+S.level+'|'+tag;
+  var used=S.used[key]||[];
+  var free=[];
+  for(var i=0;i<list.length;i++){if(used.indexOf(i)<0)free.push(i);}
+  if(!free.length){used=[];for(var j=0;j<list.length;j++)free.push(j);}
+  var idx=free[rnd(free.length)];
+  used.push(idx);
+  S.used[key]=used;
+  return list[idx];
+}
+function draw(){
+  var p=S.players[S.turn];
+  var lv=LVKEYS[S.level];
+  var solo=p.g==='F'?'G':'B';
+  var all=[solo].concat(feasibleCats(p));
+  var useBank=!S.onlyMine,fallback=false;
+  if(S.onlyMine){
+    var have=all.filter(function(k){return customList(k,lv).length>0;});
+    if(have.length){all=have;}else{useBank=true;fallback=true;}
+  }
+  var combos=all.filter(function(k){return k!==solo;});
+  var hasSolo=all.indexOf(solo)>=0;
+  var cat=(combos.length&&(!hasSolo||Math.random()<0.7))?combos[rnd(combos.length)]:solo;
+  var pool=useBank?BANK[cat][lv].concat(customList(cat,lv)):customList(cat,lv);
+  S.cur={pid:p.id,cat:cat,slots:assign(p,cat),text:pickText(cat,pool,useBank?'b':'m'),fallback:fallback};
+}
+
+/* ---------- Views ---------- */
+function brand(stage){
+  return '<header class="brand"><h1 class="logo">Pass the <span>Dare</span></h1><span class="stage">'+stage+'</span></header>';
+}
+function viewSetup(){
+  var rows=S.players.map(function(p,i){
+    return '<div class="prow">'+
+      '<input type="text" id="name-'+p.id+'" data-name="'+p.id+'" value="'+esc(p.name)+'" placeholder="Player '+(i+1)+'" aria-label="Name of player '+(i+1)+'" maxlength="24">'+
+      '<div class="seg" role="group" aria-label="Gender of player '+(i+1)+'">'+
+        '<button class="f" data-g="F" data-id="'+p.id+'" aria-pressed="'+(p.g==='F')+'">Female</button>'+
+        '<button class="m" data-g="M" data-id="'+p.id+'" aria-pressed="'+(p.g==='M')+'">Male</button>'+
+      '</div>'+
+      '<button class="x" data-remove="'+p.id+'" aria-label="Remove player '+(i+1)+'">&times;</button>'+
+    '</div>';
+  }).join('');
+  return brand('Step 1 of 3')+
+    '<h2>Who is playing?</h2>'+
+    '<p class="lede">Add each player and pick their gender. These four are examples, so rename or remove them.</p>'+
+    '<div class="panel"><div class="stack">'+rows+'</div>'+
+      '<div class="row between"><button class="btn" id="add">+ Add player</button>'+
+      '<button class="btn primary" id="to-links">Next: who plays with whom</button></div>'+
+      (S.error?'<p class="err" role="alert">'+esc(S.error)+'</p>':'')+
+    '</div>'+
+    '<div class="row between"><button class="btn" id="open-dares">Your dares ('+customCount()+')</button>'+
+    (S.onlyMine?'<span class="note">Only your dares are in play.</span>':'')+'</div>'+
+    '<p class="note">For adults who are all happy to play. Anyone can swap a dare they are not comfortable with, at any time.</p>';
+}
+function viewLinks(){
+  var cards=S.players.map(function(p){
+    var others=S.players.filter(function(o){return o.id!==p.id;});
+    var L=S.links[p.id]||[];
+    var chips=others.map(function(o){
+      return '<button class="chip" data-link="'+p.id+'|'+o.id+'" aria-pressed="'+(L.indexOf(o.id)>=0)+'"><span class="dot '+(o.g==='F'?'f':'m')+'"></span>'+esc(o.name||'Unnamed')+'</button>';
+    }).join('');
+    var hasOpp=linkedPlayers(p).length>0;
+    return '<div class="panel">'+
+      '<div class="row between"><div class="who"><span class="dot '+(p.g==='F'?'f':'m')+'"></span>'+esc(p.name||'Unnamed')+' interacts with</div>'+
+      '<button class="btn small ghost" data-all="'+p.id+'">Select all</button></div>'+
+      '<div class="chips">'+chips+'</div>'+
+      (hasOpp?'':'<p class="note">Nobody selected yet, so '+esc(p.name||'this player')+' will only get solo dares.</p>')+
+    '</div>';
+  }).join('');
+  return brand('Step 2 of 3')+
+    '<h2>Who plays with whom?</h2>'+
+    '<p class="lede">Tap the players each person is willing to do group dares with. Links work both ways, so picking Ben for Jess also picks Jess for Ben. You can untick either side.</p>'+
+    '<div class="row"><button class="btn small" id="everyone">Link everyone with everyone</button></div>'+
+    cards+
+    '<div class="row between"><button class="btn" id="back-setup">Back</button><button class="btn primary" id="start">Start the game</button></div>';
+}
+function fill(text,slots,activeId){
+  return esc(text).replace(/\{([abc])\}/g,function(m,k){
+    var pl=slots['abc'.indexOf(k)];
+    if(!pl)return '?';
+    return '<span class="nm '+(pl.g==='F'?'f':'m')+(pl.id===activeId?' me':'')+'">'+esc(pl.name||'Unnamed')+'</span>';
+  });
+}
+function viewPlay(){
+  var c=S.cur,p=byId(c.pid);
+  var order=S.players.map(function(x,i){
+    return '<span class="o'+(i===S.turn?' now':'')+'"><span class="dot '+(x.g==='F'?'f':'m')+'" style="width:8px;height:8px"></span>'+esc(x.name||'Unnamed')+'</span>';
+  }).join('');
+  var pips=[0,1,2].map(function(i){return '<span class="pip l'+i+(i<=S.level?' on':'')+'"></span>';}).join('');
+  var heatBtn=S.level<2
+    ?'<button class="btn" id="heat">Turn up the heat: '+LEVELS[S.level+1]+'</button>'
+    :'<button class="btn" disabled>Maximum heat</button>';
+  var soloLabel=(c.cat==='G'||c.cat==='B')?'Solo dare':(TAGS[c.cat]+' dare');
+  return brand('Playing')+
+    '<div class="meter"><div class="row"><div class="pips" aria-hidden="true">'+pips+'</div><span class="lvl">'+LEVELS[S.level]+' level</span></div>'+heatBtn+'</div>'+
+    '<div class="order" aria-label="Turn order">'+order+'</div>'+
+    '<section class="dare l'+S.level+'" aria-live="polite">'+
+      '<div class="stack"><span class="turn">On the spot</span><h2 class="turnname">'+esc(p.name||'Unnamed')+'</h2></div>'+
+      '<span class="tag">'+soloLabel+'</span>'+
+      '<p class="dtext">'+fill(c.text,c.slots,c.pid)+'</p>'+
+      (c.fallback?'<p class="note">You have no dares of your own at this level yet, so this one is from the built-in set.</p>':'')+
+      '<div class="actions"><button class="btn primary" id="next">Done, next player</button><button class="btn" id="swap">Swap this dare</button></div>'+
+    '</section>'+
+    '<div class="foot">'+
+      (S.level>0?'<button class="btn small ghost" id="cool">Cool it down: '+LEVELS[S.level-1]+'</button>':'')+
+      '<button class="btn small ghost" id="open-dares">Your dares</button>'+
+      '<button class="btn small ghost" id="edit">Edit players</button>'+
+    '</div>';
+}
+function viewDares(){
+  var d=S.draft;
+  var catOpts=Object.keys(ROLES).map(function(k){return '<option value="'+esc(k)+'"'+(k===d.cat?' selected':'')+'>'+esc(CATLABEL[k])+'</option>';}).join('');
+  var lvOpts=LVKEYS.map(function(k,i){return '<option value="'+k+'"'+(k===d.level?' selected':'')+'>'+LEVELS[i]+'</option>';}).join('');
+  var toks=['{a}','{b}','{c}'].slice(0,ROLES[d.cat].length).map(function(t){return '<button class="btn small tok" data-ins="'+t+'">'+t+'</button>';}).join('');
+  var groups='';
+  Object.keys(ROLES).forEach(function(c){
+    LVKEYS.forEach(function(l,li){
+      var list=customList(c,l);
+      if(!list.length)return;
+      groups+='<div><div class="gh">'+esc(c)+' &middot; '+LEVELS[li]+'</div>'+list.map(function(t,i){
+        return '<div class="mine"><p>'+esc(t)+'</p><button class="btn small ghost" data-del="'+esc(c)+'|'+l+'|'+i+'" aria-label="Delete this dare">Delete</button></div>';
+      }).join('')+'</div>';
+    });
+  });
+  if(!groups)groups='<p class="note">Nothing here yet. Dares you add will show up in this list.</p>';
+  return brand('Your dares')+
+    '<h2>Add your own dares</h2>'+
+    '<p class="lede">Pick who the dare is for and how intense it is, then type it. Use <span class="tok">{a}</span>, <span class="tok">{b}</span> and <span class="tok">{c}</span> where player names should appear. They are saved in this browser only.</p>'+
+    '<div class="panel">'+
+      '<div class="grid2">'+
+        '<label class="fl" for="dare-cat">Category<select id="dare-cat">'+catOpts+'</select></label>'+
+        '<label class="fl" for="dare-level">Level<select id="dare-level">'+lvOpts+'</select></label>'+
+      '</div>'+
+      '<p class="note">'+esc(ROLEHINT[d.cat])+'</p>'+
+      '<label class="fl" for="dare-text">Dare<textarea id="dare-text" maxlength="300" placeholder="e.g. {b}, give {a} a 30-second foot rub.">'+esc(d.text)+'</textarea></label>'+
+      '<div class="row between"><div class="row"><span class="note">Insert a name:</span>'+toks+'</div>'+
+      '<button class="btn primary" id="add-dare">Add dare</button></div>'+
+      (d.err?'<p class="err" role="alert">'+esc(d.err)+'</p>':'')+
+    '</div>'+
+    '<div class="panel">'+
+      '<label class="sw" for="only-mine"><input type="checkbox" id="only-mine"'+(S.onlyMine?' checked':'')+'><span><span class="t">Only use my dares</span><br><span class="note">Leaves the built-in dares out. If you have none for the current level, the game uses the built-in ones for that turn so it never stalls.</span></span></label>'+
+    '</div>'+
+    '<div class="panel"><h2>Your list ('+customCount()+')</h2>'+groups+'</div>'+
+    '<div class="panel"><h2>Back up your dares</h2>'+
+      '<p class="note">Copy your list as text and keep it in a note. Paste it back here on any browser or device to load it. Loading adds to your list and skips dares you already have.</p>'+
+      '<textarea id="backup-text" aria-label="Backup text" placeholder="Your copied dares appear here. To load dares, paste them here.">'+esc(S.backup.text)+'</textarea>'+
+      '<div class="row"><button class="btn" id="export-dares">Copy my dares</button><button class="btn primary" id="import-dares">Load dares from text</button></div>'+
+      (S.backup.msg?'<p class="note" role="status">'+esc(S.backup.msg)+'</p>':'')+
+    '</div>'+
+    '<div class="row"><button class="btn" id="dares-back">'+(S.prev==='play'?'Back to the game':'Back')+'</button></div>';
+}
+function render(){
+  var app=document.getElementById('app');
+  app.innerHTML=S.screen==='setup'?viewSetup():S.screen==='links'?viewLinks():S.screen==='dares'?viewDares():viewPlay();
+}
+
+/* ---------- Events ---------- */
+function toggleLink(a,b){
+  var A=S.links[a]||[],B=S.links[b]||[];
+  var on=A.indexOf(b)<0;
+  if(on){A.push(b);if(B.indexOf(a)<0)B.push(a);}
+  else{A=A.filter(function(x){return x!==b;});B=B.filter(function(x){return x!==a;});}
+  S.links[a]=A;S.links[b]=B;
+}
+function cleanLinks(){
+  var ids=S.players.map(function(p){return p.id;});
+  var out={};
+  ids.forEach(function(id){out[id]=(S.links[id]||[]).filter(function(x){return ids.indexOf(x)>=0&&x!==id;});});
+  S.links=out;
+}
+document.getElementById('app').addEventListener('input',function(e){
+  var id=e.target.getAttribute&&e.target.getAttribute('data-name');
+  if(id){var p=byId(id);if(p){p.name=e.target.value;}}
+  if(e.target.id==='dare-text'){S.draft.text=e.target.value;}
+  if(e.target.id==='backup-text'){S.backup.text=e.target.value;}
+});
+document.getElementById('app').addEventListener('change',function(e){
+  var id=e.target.id;
+  if(id==='dare-cat'){S.draft.cat=e.target.value;S.draft.err='';render();}
+  else if(id==='dare-level'){S.draft.level=e.target.value;S.draft.err='';render();}
+  else if(id==='only-mine'){S.onlyMine=e.target.checked;S.dirty=true;S.used={};saveCustom();render();}
+});
+document.getElementById('app').addEventListener('click',function(e){
+  var t=e.target.closest('button');
+  if(!t)return;
+  var d=t.dataset;
+  if(d.g){var p=byId(d.id);if(p){p.g=d.g;}render();return;}
+  if(d.remove){S.players=S.players.filter(function(x){return x.id!==d.remove;});S.error='';render();return;}
+  if(t.id==='add'){
+    var np={id:nextId(),name:'',g:'F'};S.players.push(np);render();
+    var el=document.getElementById('name-'+np.id);if(el)el.focus();return;
+  }
+  if(t.id==='to-links'){
+    S.players.forEach(function(p,i){if(!p.name.trim())p.name='Player '+(i+1);else p.name=p.name.trim();});
+    if(S.players.length<2){S.error='Add at least two players to start.';render();return;}
+    S.error='';cleanLinks();save();S.screen='links';render();return;
+  }
+  if(d.link){var parts=d.link.split('|');toggleLink(parts[0],parts[1]);save();render();return;}
+  if(d.all){S.players.forEach(function(o){if(o.id!==d.all){var L=S.links[d.all]||[];if(L.indexOf(o.id)<0)toggleLink(d.all,o.id);}});save();render();return;}
+  if(t.id==='everyone'){
+    S.players.forEach(function(a){S.players.forEach(function(b){if(a.id!==b.id){var L=S.links[a.id]||[];if(L.indexOf(b.id)<0)toggleLink(a.id,b.id);}});});
+    save();render();return;
+  }
+  if(t.id==='back-setup'){S.screen='setup';render();return;}
+  if(t.id==='start'){S.level=0;S.turn=0;S.used={};draw();S.screen='play';render();return;}
+  if(t.id==='next'){S.turn=(S.turn+1)%S.players.length;draw();render();return;}
+  if(t.id==='swap'){draw();render();return;}
+  if(t.id==='heat'){if(S.level<2){S.level+=1;draw();render();}return;}
+  if(t.id==='cool'){if(S.level>0){S.level-=1;draw();render();}return;}
+  if(t.id==='edit'){S.screen='setup';render();return;}
+  if(t.id==='open-dares'){S.prev=S.screen;S.screen='dares';render();return;}
+  if(t.id==='dares-back'){
+    S.screen=S.prev||'setup';
+    if(S.screen==='play'&&S.dirty){draw();}
+    S.dirty=false;render();return;
+  }
+  if(d.ins){
+    var ta=document.getElementById('dare-text');
+    var s=ta.selectionStart||0,en=ta.selectionEnd||s;
+    S.draft.text=ta.value.slice(0,s)+d.ins+ta.value.slice(en);
+    render();
+    ta=document.getElementById('dare-text');ta.focus();
+    var pos=s+d.ins.length;ta.setSelectionRange(pos,pos);return;
+  }
+  if(t.id==='add-dare'){
+    var txt=(S.draft.text||'').replace(/\s+/g,' ').trim();
+    if(!txt){S.draft.err='Type a dare first.';render();return;}
+    var c=S.draft.cat,l=S.draft.level;
+    S.custom[c]=S.custom[c]||{};
+    S.custom[c][l]=(S.custom[c][l]||[]).concat([txt.slice(0,300)]);
+    S.draft.text='';S.draft.err='';S.dirty=true;S.used={};saveCustom();
+    render();document.getElementById('dare-text').focus();return;
+  }
+  if(t.id==='export-dares'){
+    if(!customCount()){S.backup.msg='You have no dares to copy yet.';render();return;}
+    var tx=JSON.stringify({passTheDare:1,custom:S.custom});
+    S.backup.text=tx;
+    var fin=function(m){S.backup.msg=m;render();var b=document.getElementById('backup-text');if(b){b.focus();b.select();}};
+    var manual='Select the text above and copy it, then keep it somewhere safe.';
+    try{navigator.clipboard.writeText(tx).then(function(){fin('Copied. Paste it into a note to keep it safe.');},function(){fin(manual);});}
+    catch(err){fin(manual);}
+    return;
+  }
+  if(t.id==='import-dares'){
+    S.backup.msg=importDares((S.backup.text||'').trim());
+    render();return;
+  }
+  if(d.del){
+    var q=d.del.split('|');
+    var arr=customList(q[0],q[1]).slice();
+    arr.splice(parseInt(q[2],10),1);
+    S.custom[q[0]][q[1]]=arr;
+    S.dirty=true;S.used={};saveCustom();render();return;
+  }
+});
+
+if(!load())seed();
+loadCustom();
+render();
+</script>
+
+</body>
+</html>
